@@ -7,6 +7,36 @@ import io.cucumber.junit.CucumberOptions;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
+        features = "src/test/resources/features",
+        glue = "stepDefinitions",
+        plugin = {
+                "pretty",
+                "html:reports/cucumber-report.html",
+                "rerun:target/rerun.txt",
+                "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:"
+        },
+        monochrome = true,
+        dryRun = false,
+        publish = true
+        // tags = "@smoke"
+        // tags = "@regression"
+        // tags = "@smoke and @regression"
+        // tags = "@smoke and not @regression"
+        // tags = "@smoke or @regression"
+)
+public class TestRunner2 {
+
+}
+
+/*package testRunner;
+
+import org.junit.runner.RunWith;
+
+import io.cucumber.junit.Cucumber;
+import io.cucumber.junit.CucumberOptions;
+
+@RunWith(Cucumber.class)
+@CucumberOptions(
 					//features= {".//Features/"},
 					//features= {".//Features/Login.feature"},
 					//features= {".//Features/LoginDDTExcel.feature"},
@@ -30,4 +60,4 @@ import io.cucumber.junit.CucumberOptions;
 		)
 public class TestRunner2 {
 
-		}
+		}*/
