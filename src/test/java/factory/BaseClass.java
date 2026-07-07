@@ -82,8 +82,8 @@ public class BaseClass {
 	}
 
 	public static Logger getLogger() {
-		logger = LogManager.getLogger(); // Log4j
-		return logger;
+	    logger = LogManager.getLogger(BaseClass.class);
+	    return logger;
 	}
 
 	public static String randomString() {

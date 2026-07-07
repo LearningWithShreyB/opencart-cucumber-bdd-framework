@@ -2,8 +2,8 @@ package stepDefinitions;
 
 import java.util.Map;
 
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-//import org.testng.Assert;
 import org.openqa.selenium.WebDriver;
 
 import factory.BaseClass;
@@ -15,52 +15,72 @@ import pageObjects.AccountRegistrationPage;
 import pageObjects.HomePage;
 import pageObjects.LoginPage;
 
-
 public class RegistrationSteps {
 
-	 WebDriver driver;
-     HomePage hp;
-     LoginPage lp;
-     AccountRegistrationPage regpage;
-     
+	WebDriver driver;
+	HomePage hp;
+	LoginPage lp;
+	AccountRegistrationPage regpage;
+	Logger logger = BaseClass.getLogger();
+
 	@Given("the user navigates to Register Account page")
 	public void user_navigates_to_register_account_page() {
-	
-		hp=new HomePage(BaseClass.getDriver());
-    	hp.clickMyAccount();
-        hp.clickRegister();
-                   
+
+		logger.info("Navigating to Registration page.");
+
+		hp = new HomePage(BaseClass.getDriver());
+		hp.clickMyAccount();
+		hp.clickRegister();
+
 	}
 
 	@When("the user enters the details into below fields")
 	public void user_enters_the_details_into_below_fields(DataTable dataTable) {
-		
-		Map<String, String> dataMap = dataTable.asMap(String.class,String.class);
-	    
-		regpage=new AccountRegistrationPage(BaseClass.getDriver());
+
+		logger.info("Entering registration details.");
+
+		Map<String, String> dataMap = dataTable.asMap(String.class, String.class);
+
+		regpage = new AccountRegistrationPage(BaseClass.getDriver());
+
 		regpage.setFirstName(dataMap.get("firstName"));
 		regpage.setLastName(dataMap.get("lastName"));
-		regpage.setEmail(BaseClass.randomAlphaNumeric()+"@gmail.com");
+		regpage.setEmail(BaseClass.randomAlphaNumeric() + "@gmail.com");
 		regpage.setTelephone(dataMap.get("telephone"));
 		regpage.setPassword(dataMap.get("password"));
 		regpage.setConfirmPassword(dataMap.get("password"));
-		
+
+		logger.info("Registration details entered successfully.");
+
 	}
 
 	@When("the user selects Privacy Policy")
 	public void user_selects_privacy_policy() {
+
 		regpage.setPrivacyPolicy();
+		logger.info("Privacy Policy selected.");
+
 	}
 
 	@When("the user clicks on Continue button")
 	public void user_clicks_on_continue_button() {
+
 		regpage.clickContinue();
+		logger.info("Clicked on Continue button.");
+
 	}
 
 	@Then("the user account should get created successfully")
 	public void user_account_should_get_created_successfully() {
-		
-		String confmsg=regpage.getConfirmationMsg();
-		Assert.assertEquals(confmsg, "Your Account Has Been Created!");
-		}
- }
+
+		logger.info("Verifying account registration.");
+
+		String confmsg = regpage.getConfirmationMsg();
+
+		Assert.assertEquals(confmsg, "Your Account Has Been Createded!");
+
+		logger.info("Account registration verified successfully.");
+
+	}
+
+}
