@@ -20,107 +20,102 @@ import utilities.ExcelWriter;
 
 public class LoginSteps {
 
-	WebDriver driver;
-	HomePage hp;
-	LoginPage lp;
-	MyAccountPage macc;
-	Logger logger = BaseClass.getLogger();
+	private WebDriver driver;
+	private HomePage homePage;
+	private LoginPage loginPage;
+	private MyAccountPage myAccountPage;
 
-	List<HashMap<String, String>> datamap;
+	private Logger logger = BaseClass.getLogger();
+
+	private List<HashMap<String, String>> dataMap;
+
 	private static final String EXCEL_FILE_PATH = System.getProperty("user.dir")
 			+ "\\src\\test\\resources\\testData\\Opencart_LoginData.xlsx";
 
 	private static final String SHEET_NAME = "Sheet1";
 
-	@Given("the user navigates to login page")
-	public void user_navigate_to_login_page() {
+	@Given("the user navigates to the Login page")
+	public void the_user_navigates_to_the_login_page() {
 
 		logger.info("Navigating to Login page.");
 
-		hp = new HomePage(BaseClass.getDriver());
+		homePage = new HomePage(BaseClass.getDriver());
 
-		hp.clickMyAccount();
-		hp.clickLogin();
-
+		homePage.clickMyAccount();
+		homePage.clickLogin();
 	}
 
-	@When("user enters email as {string} and password as {string}")
-	public void user_enters_email_as_and_password_as(String email, String pwd) {
+	@When("the user enters email as {string} and password as {string}")
+	public void the_user_enters_email_as_and_password_as(String email, String password) {
 
 		logger.info("Entering login credentials.");
 
-		lp = new LoginPage(BaseClass.getDriver());
+		loginPage = new LoginPage(BaseClass.getDriver());
 
-		lp.setEmail(email);
-		lp.setPassword(pwd);
-
+		loginPage.setEmail(email);
+		loginPage.setPassword(password);
 	}
 
 	@When("the user clicks on the Login button")
-	public void click_on_login_button() {
+	public void the_user_clicks_on_the_login_button() {
 
-		lp.clickLogin();
+		logger.info("Clicking on Login button.");
 
-		logger.info("Clicked on Login button.");
-
+		loginPage.clickLogin();
 	}
 
-	@Then("the user should be redirected to the MyAccount Page")
-	public void user_navigates_to_my_account_page() {
+	@Then("the user should be redirected to the My Account page")
+	public void the_user_should_be_redirected_to_the_my_account_page() {
 
 		logger.info("Verifying My Account page.");
 
-		macc = new MyAccountPage(BaseClass.getDriver());
+		myAccountPage = new MyAccountPage(BaseClass.getDriver());
 
-		boolean targetPage = macc.isMyAccountPageExists();
-
-		Assert.assertTrue(targetPage);
+		Assert.assertTrue("User was not redirected to the My Account page.", myAccountPage.isMyAccountPageExists());
 
 		logger.info("User successfully logged in.");
-
 	}
 
-	// *************** Data Driven Test ****************
+	// **************** Login Data Driven Test ****************
 
-	@Then("the user should be redirected to the MyAccount Page by passing email and password with excel row {string}")
-	public void check_user_navigates_to_my_account_page_by_passing_email_and_password_with_excel_data(String rows)
-			throws IOException {
+	@Then("the user should be redirected to the My Account page by passing email and password with excel row {string}")
+	public void the_user_should_be_redirected_to_the_my_account_page_by_passing_email_and_password_with_excel_row(
+			String rowNumber) throws IOException {
 
 		logger.info("Executing Login Data Driven Test.");
 
-		datamap = DataReader.data(EXCEL_FILE_PATH, SHEET_NAME);
+		dataMap = DataReader.data(EXCEL_FILE_PATH, SHEET_NAME);
 
-		int index = Integer.parseInt(rows) - 1;
+		int index = Integer.parseInt(rowNumber) - 1;
 
-		String email = datamap.get(index).get("username");
-		String pwd = datamap.get(index).get("password");
-		String expRes = datamap.get(index).get("res");
+		String email = dataMap.get(index).get("username");
+		String password = dataMap.get(index).get("password");
+		String expectedResult = dataMap.get(index).get("res");
 
-		lp = new LoginPage(BaseClass.getDriver());
+		loginPage = new LoginPage(BaseClass.getDriver());
 
-		lp.setEmail(email);
-		lp.setPassword(pwd);
+		loginPage.setEmail(email);
+		loginPage.setPassword(password);
+		loginPage.clickLogin();
 
-		lp.clickLogin();
-
-		macc = new MyAccountPage(BaseClass.getDriver());
+		myAccountPage = new MyAccountPage(BaseClass.getDriver());
 
 		try {
 
-			boolean targetPage = macc.isMyAccountPageExists();
+			boolean loginStatus = myAccountPage.isMyAccountPageExists();
 
-			logger.info("Expected Result : " + expRes);
-			logger.info("Actual Login Status : " + targetPage);
+			logger.info("Expected Result : {}", expectedResult);
+			logger.info("Actual Login Status : {}", loginStatus);
 
-			if (expRes.equalsIgnoreCase("Valid")) {
+			if (expectedResult.equalsIgnoreCase("Valid")) {
 
-				if (targetPage) {
+				if (loginStatus) {
 
-					macc.clickLogout();
-
-					logger.info("Valid login successful.");
+					logger.info("Valid login verified successfully.");
 
 					ExcelWriter.writeResult(EXCEL_FILE_PATH, SHEET_NAME, index + 1, "PASS");
+
+					myAccountPage.clickLogout();
 
 					Assert.assertTrue(true);
 
@@ -130,21 +125,20 @@ public class LoginSteps {
 
 					ExcelWriter.writeResult(EXCEL_FILE_PATH, SHEET_NAME, index + 1, "ERROR");
 
-					Assert.fail();
-
+					Assert.fail("Valid login was expected but failed.");
 				}
 
-			} else if (expRes.equalsIgnoreCase("Invalid")) {
+			} else {
 
-				if (targetPage) {
-
-					macc.clickLogout();
+				if (loginStatus) {
 
 					logger.error("Invalid login unexpectedly succeeded.");
 
 					ExcelWriter.writeResult(EXCEL_FILE_PATH, SHEET_NAME, index + 1, "ERROR");
 
-					Assert.fail();
+					myAccountPage.clickLogout();
+
+					Assert.fail("Invalid login unexpectedly succeeded.");
 
 				} else {
 
@@ -153,20 +147,16 @@ public class LoginSteps {
 					ExcelWriter.writeResult(EXCEL_FILE_PATH, SHEET_NAME, index + 1, "PASS");
 
 					Assert.assertTrue(true);
-
 				}
-
 			}
 
 		} catch (Exception e) {
 
-			logger.error("Exception occurred during Login DDT.", e);
+			logger.error("Exception occurred during Login Data Driven Test.", e);
 
 			ExcelWriter.writeResult(EXCEL_FILE_PATH, SHEET_NAME, index + 1, "ERROR");
-			Assert.fail();
 
+			Assert.fail("Exception occurred while executing Login Data Driven Test.");
 		}
-
 	}
-
 }
