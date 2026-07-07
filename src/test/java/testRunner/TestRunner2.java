@@ -8,24 +8,17 @@ import io.cucumber.junit.CucumberOptions;
 import utilities.ReportOpener;
 
 @RunWith(Cucumber.class)
-@CucumberOptions(features = "src/test/resources/features", glue = "stepDefinitions", plugin = { "pretty",
-		"html:reports/cucumber-report.html", "rerun:target/rerun.txt",
-		"com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:" }, monochrome = true, dryRun = false, publish = true
-// tags = "@smoke"
-// tags = "@regression"
-// tags = "@smoke and @regression"
-// tags = "@smoke and not @regression"
-// tags = "@smoke or @regression"
-)
+@CucumberOptions(features = { /*"src/test/resources/features/Registration.feature",
+		"src/test/resources/features/Login.feature",*/
+		"src/test/resources/features/LoginDDTExcel.feature" }, glue = "stepDefinitions", plugin = { "pretty",
+				"html:reports/cucumber-report.html", "rerun:target/rerun.txt",
+				"com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:" }, monochrome = true, dryRun = false, publish = true)
 public class TestRunner2 {
 
 	@AfterClass
 	public static void openExtentReport() {
-
 		ReportOpener.openExtentReport();
-
 	}
-
 }
 /*
  * package testRunner;
