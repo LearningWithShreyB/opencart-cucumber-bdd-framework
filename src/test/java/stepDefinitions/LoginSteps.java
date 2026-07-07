@@ -1,5 +1,6 @@
 package stepDefinitions;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import pageObjects.HomePage;
 import pageObjects.LoginPage;
 import pageObjects.MyAccountPage;
 import utilities.DataReader;
+import utilities.ExcelWriter;
 
 public class LoginSteps {
 
@@ -25,6 +27,10 @@ public class LoginSteps {
 	Logger logger = BaseClass.getLogger();
 
 	List<HashMap<String, String>> datamap;
+	private static final String EXCEL_FILE_PATH = System.getProperty("user.dir")
+			+ "\\src\\test\\resources\\testData\\Opencart_LoginData.xlsx";
+
+	private static final String SHEET_NAME = "Sheet1";
 
 	@Given("the user navigates to login page")
 	public void user_navigate_to_login_page() {
@@ -77,15 +83,12 @@ public class LoginSteps {
 	// *************** Data Driven Test ****************
 
 	@Then("the user should be redirected to the MyAccount Page by passing email and password with excel row {string}")
-	public void check_user_navigates_to_my_account_page_by_passing_email_and_password_with_excel_data(
-			String rows) {
+	public void check_user_navigates_to_my_account_page_by_passing_email_and_password_with_excel_data(String rows)
+			throws IOException {
 
 		logger.info("Executing Login Data Driven Test.");
 
-		datamap = DataReader.data(
-			    System.getProperty("user.dir")
-			        + "\\src\\test\\resources\\testData\\Opencart_LoginData.xlsx",
-			    "Sheet1");
+		datamap = DataReader.data(EXCEL_FILE_PATH, SHEET_NAME);
 
 		int index = Integer.parseInt(rows) - 1;
 
@@ -117,11 +120,15 @@ public class LoginSteps {
 
 					logger.info("Valid login successful.");
 
+					ExcelWriter.writeResult(EXCEL_FILE_PATH, SHEET_NAME, index + 1, "PASS");
+
 					Assert.assertTrue(true);
 
 				} else {
 
 					logger.error("Valid login failed.");
+
+					ExcelWriter.writeResult(EXCEL_FILE_PATH, SHEET_NAME, index + 1, "ERROR");
 
 					Assert.fail();
 
@@ -135,11 +142,15 @@ public class LoginSteps {
 
 					logger.error("Invalid login unexpectedly succeeded.");
 
+					ExcelWriter.writeResult(EXCEL_FILE_PATH, SHEET_NAME, index + 1, "ERROR");
+
 					Assert.fail();
 
 				} else {
 
 					logger.info("Invalid login verified successfully.");
+
+					ExcelWriter.writeResult(EXCEL_FILE_PATH, SHEET_NAME, index + 1, "PASS");
 
 					Assert.assertTrue(true);
 
@@ -151,6 +162,7 @@ public class LoginSteps {
 
 			logger.error("Exception occurred during Login DDT.", e);
 
+			ExcelWriter.writeResult(EXCEL_FILE_PATH, SHEET_NAME, index + 1, "ERROR");
 			Assert.fail();
 
 		}
