@@ -2,6 +2,8 @@ package testRunner;
 
 import io.cucumber.testng.AbstractTestNGCucumberTests;
 import io.cucumber.testng.CucumberOptions;
+import org.testng.annotations.AfterSuite;
+import utilities.ReportOpener;
 
 @CucumberOptions(
         features = "src/test/resources/features/Registration.feature",
@@ -18,5 +20,12 @@ import io.cucumber.testng.CucumberOptions;
 )
 
 public class TestRunner extends AbstractTestNGCucumberTests {
+
+    @AfterSuite
+    public void openExtentReport() {
+
+        ReportOpener.openExtentReport();
+
+    }
 
 }

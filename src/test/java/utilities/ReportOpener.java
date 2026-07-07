@@ -3,31 +3,44 @@ package utilities;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class ReportOpener {
 
 	public static void openExtentReport() {
 
-		File report = new File("ExtentReport/CucumberExtentReport.html");
+		try {
 
-		if (report.exists()) {
+			File reportsFolder = new File("test-output");
 
-			try {
+			File[] reportFolders = reportsFolder.listFiles(file ->
+					file.isDirectory() && file.getName().startsWith("SparkReport"));
 
-				Desktop.getDesktop().browse(report.toURI());
-
-			} catch (IOException e) {
-
-				e.printStackTrace();
-
+			if (reportFolders == null || reportFolders.length == 0) {
+				System.out.println("No SparkReport folder found.");
+				return;
 			}
 
-		} else {
+			File latestFolder = Arrays.stream(reportFolders)
+					.max(Comparator.comparingLong(File::lastModified))
+					.orElse(null);
 
-			System.out.println("Extent Report not found at: " + report.getAbsolutePath());
+			if (latestFolder == null) {
+				System.out.println("No latest SparkReport folder found.");
+				return;
+			}
 
+			File report = new File(latestFolder, "ExtentReport.html");
+
+			if (report.exists()) {
+				Desktop.getDesktop().browse(report.toURI());
+			} else {
+				System.out.println("Extent Report not found: " + report.getAbsolutePath());
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-
 	}
-
 }

@@ -49,7 +49,6 @@ public class Hooks {
 		}
 
 		driver.quit();
-		ReportOpener.openExtentReport();
 		logger.info("Browser closed successfully.");
 		logger.info("*************** Test Execution Finished ***************");
 
